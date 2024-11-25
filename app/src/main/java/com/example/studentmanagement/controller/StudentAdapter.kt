@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,11 +21,25 @@ import com.example.studentmanagement.model.Student
 import com.google.android.material.snackbar.Snackbar
 
 class StudentAdapter(private var students: MutableList<Student>): RecyclerView.Adapter<StudentAdapter.StudentViewHolder>() {
-    class StudentViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        val studentName: TextView = itemView.findViewById(R.id.student_name)
-        val studentID: TextView = itemView.findViewById(R.id.student_id)
-        val imageEdit: ImageView = itemView.findViewById(R.id.image_edit)
-        val imageRemove: ImageView = itemView.findViewById(R.id.image_remove)
+    companion object {
+        var currentPosition: Int = -1
+    }
+
+    inner class StudentViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+        private val studentName: TextView = itemView.findViewById(R.id.student_name)
+        private val studentID: TextView = itemView.findViewById(R.id.student_id)
+
+        init {
+            itemView.setOnLongClickListener {
+                currentPosition = adapterPosition
+                false
+            }
+        }
+
+        fun bind(student: Student) {
+            studentName.text = student.studentName
+            studentID.text = student.studentId
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StudentViewHolder {
@@ -39,15 +52,7 @@ class StudentAdapter(private var students: MutableList<Student>): RecyclerView.A
     override fun onBindViewHolder(holder: StudentViewHolder, position: Int) {
         val student = students[position]
 
-        holder.studentName.text = student.studentName
-        holder.studentID.text= student.studentId
-
-        holder.imageEdit.setOnClickListener {
-            showUpdateDialog(holder.itemView.context, position)
-        }
-        holder.imageRemove.setOnClickListener {
-            showRemoveDialog(holder.itemView.context, position)
-        }
+        holder.bind(student)
     }
 
     private fun showUpdateDialog(context: Context, position: Int) {
